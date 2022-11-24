@@ -1,0 +1,47 @@
+{
+  "name": "@projectbasalt/firestore",
+  "version": "1.0.0",
+  "description": "A shared Firestore interface for both client and server.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test:ts": "npx tsc --noEmit",
+    "build": "npx tsc",
+    "clean": "rm -rf dist",
+    "prepare-pack": "npm run build && cp package.json ./dist && cp .npmignore ./dist && cp ./src/global.d.ts ./dist",
+    "bundle": "npm run prepare-pack && npm pack ./dist && npm run clean",
+    "release": "npm run prepare-pack && npm publish ./dist && npm run clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/projectnatz/projectbasalt-firestore.git"
+  },
+  "keywords": [
+    "firestore",
+    "firebase",
+    "interface",
+    "typescript",
+    "typed",
+    "type",
+    "client",
+    "server"
+  ],
+  "author": "Francesco Natati",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/projectnatz/projectbasalt-firestore/issues"
+  },
+  "homepage": "https://github.com/projectnatz/projectbasalt-firestore#readme",
+  "devDependencies": {
+    "@react-native-firebase/firestore": "^16.4.6",
+    "firebase": "^9.14.0",
+    "firebase-admin": "^11.3.0",
+    "typescript": "^4.9.3"
+  },
+  "dependencies": {
+    "@projectbasalt/core": "file:../projectbasalt-core/projectbasalt-core-1.0.0.tgz"
+  }
+}
