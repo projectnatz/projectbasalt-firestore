@@ -3,7 +3,7 @@ import { collection, Collection } from "./Collection"
 import type { Database } from "./Database"
 import { doc, Doc } from "./Doc"
 import { parentPath, PathParent } from "./Path"
-import type { Snapshot } from "./Snapshot"
+import type { MaybeSnapshot } from "./Snapshot"
 
 export const RefField = Symbol("pn.basalt.ref_field")
 
@@ -29,7 +29,7 @@ export function parent<Path extends string>(reference: Collection<Path> | Doc<Pa
 		: doc(path)
 }
 
-export function ref<Path extends string, Tree extends Database.Tree>(snapshot: Snapshot<Path, Tree> | Doc<Path>)
+export function ref<Path extends string, Tree extends Database.Tree>(snapshot: MaybeSnapshot<Path, Tree> | Doc<Path>)
 {
 	return typecheck(snapshot, Doc)
 		? snapshot
