@@ -26,7 +26,7 @@ export type Snapshot<Path extends string, Tree extends Database.Tree> = ([PathVa
 }
 
 export const EmptySnapshot = {
-	Type: "pn.basalt.empty_snapshot" as Type<EmptySnapshot<string>>
+	Type: "pn.basalt.empty_snapshot" as Type<{ [Type.Field]: "pn.basalt.empty_snapshot", [SnapshotField]: any, [RefField]: any }>
 } as const
 
 export const Snapshot = {
