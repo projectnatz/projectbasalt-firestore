@@ -2,8 +2,6 @@ import { Type } from "@projectbasalt/core"
 import type { Transaction } from "./Transaction"
 import type { WriteBatch } from "./WriteBatch"
 
-const DATABASE_TYPE = Symbol("pn.basalt.database")
-
 /**
  * @version 1.0.0
  */

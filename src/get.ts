@@ -7,7 +7,7 @@ import { prepareQuery, Query } from "./Query"
 import { querySnapshot, QuerySnapshot } from "./QuerySnapshot"
 import { Transaction } from "./Transaction"
 import { PathGroup } from "./Path"
-import { Invalid, typecheck } from "@projectbasalt/core"
+import { typecheck } from "@projectbasalt/core"
 
 /** @version 1.0.0 */
 export interface Unsubscribe
@@ -21,23 +21,22 @@ export interface Unsubscribe
  * 
  * @version 1.0.0
  */
-export function getDoc<PATH extends string, DB extends Database>(transaction: Transaction<DB>, reference: Doc<PATH>): Promise<Invalid | MaybeSnapshot<PATH, Database.Collection<DB>>>
+export function getDoc<PATH extends string, DB extends Database>(transaction: Transaction<DB>, reference: Doc<PATH>): Promise<MaybeSnapshot<PATH, Database.Collection<DB>>>
 
 /**
  * Reads the document referred to by this `DocumentReference`.
  * 
  * @version 1.0.0
  */
-export function getDoc<PATH extends string, DB extends Database>(db: DB, reference: Doc<PATH>): Promise<Invalid | MaybeSnapshot<PATH, Database.Collection<DB>>>
+export function getDoc<PATH extends string, DB extends Database>(db: DB, reference: Doc<PATH>): Promise<MaybeSnapshot<PATH, Database.Collection<DB>>>
 
-export function getDoc(source: Transaction<Database> | Database, reference: Doc<string>): Promise<Invalid | MaybeSnapshot<string, any>>
+export function getDoc(source: Transaction<Database> | Database, reference: Doc<string>): Promise<MaybeSnapshot<string, any>>
 {
 	const db = typecheck(source, Database) ? source : source._db
 	const documentReference = db.doc(reference.path)
 
 	return (typecheck(source, Database) ? source.getDoc(documentReference) : source._transaction.get(documentReference))
 		.then(documentSnapshot => snapshot(db, documentSnapshot))
-		.catch((error) => Invalid(error?.code ?? 'thrown/get-doc'))
 }
 
 /**
@@ -46,16 +45,16 @@ export function getDoc(source: Transaction<Database> | Database, reference: Doc<
  * @version 1.0.0
  */
 // @ts-ignore
-export function getDocs<Id extends string, DB extends Database>(db: DB | Transaction<DB>, query: CollectionGroup<Id> | Query.Group<Id>): Promise<Invalid | QuerySnapshot<PathGroup<Id, Database.Collection<DB>>, Database.Collection<DB>>>
+export function getDocs<Id extends string, DB extends Database>(db: DB | Transaction<DB>, query: CollectionGroup<Id> | Query.Group<Id>): Promise<QuerySnapshot<PathGroup<Id, Database.Collection<DB>>, Database.Collection<DB>>>
 
 /**
  * Executes the query and returns the results as a `QuerySnapshot`.
  * 
  * @version 1.0.0
  */
-export function getDocs<Path extends string, DB extends Database>(db: DB | Transaction<DB>, query: Collection<Path> | Query.Standard<Path>): Promise<Invalid | QuerySnapshot<Path, Database.Collection<DB>>>
+export function getDocs<Path extends string, DB extends Database>(db: DB | Transaction<DB>, query: Collection<Path> | Query.Standard<Path>): Promise<QuerySnapshot<Path, Database.Collection<DB>>>
 
-export function getDocs(source: Database | Transaction<Database>, query: CollectionGroup<string> | Collection<string> | Query<string>): Promise<Invalid | QuerySnapshot<any, any>>
+export function getDocs(source: Database | Transaction<Database>, query: CollectionGroup<string> | Collection<string> | Query<string>): Promise<QuerySnapshot<any, any>>
 {
 	const db = typecheck(source, Database) ? source : source._db
 	const reference =
@@ -67,7 +66,6 @@ export function getDocs(source: Database | Transaction<Database>, query: Collect
 
 	return (typecheck(source, Database) ? source.getDocs(reference) : source._transaction.get(reference))
 		.then(snapshot => querySnapshot(db, snapshot))
-		.catch((error) => Invalid(error?.code ?? 'thrown/get-docs'))
 }
 
 /**
