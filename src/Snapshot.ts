@@ -7,15 +7,7 @@ import { RefField } from "./ref"
 export const SnapshotField = Symbol("pn.basalt.snapshot_field")
 
 /** @version 1.0.0 */
-export type MaybeSnapshot<Path extends string, Tree extends Database.Tree> = EmptySnapshot<Path> | Snapshot<Path, Tree>
-
-/** @version 1.0.0 */
-export interface EmptySnapshot<Path extends string>
-{
-	readonly [Type.Field]: "pn.basalt.empty_snapshot"
-	readonly [SnapshotField]: any
-	readonly [RefField]: Doc<Path>
-}
+export type MaybeSnapshot<Path extends string, Tree extends Database.Tree> = undefined | Snapshot<Path, Tree>
 
 /** @version 1.0.0 */
 export type Snapshot<Path extends string, Tree extends Database.Tree> = ([PathValue<Path, Tree>] extends [never] ? {} : PathValue<Path, Tree>) &
@@ -24,10 +16,6 @@ export type Snapshot<Path extends string, Tree extends Database.Tree> = ([PathVa
 	readonly [SnapshotField]: any
 	readonly [RefField]: Doc<Path>
 }
-
-export const EmptySnapshot = {
-	Type: "pn.basalt.empty_snapshot" as Type<{ [Type.Field]: "pn.basalt.empty_snapshot", [SnapshotField]: any, [RefField]: any }>
-} as const
 
 export const Snapshot = {
 	Type: "pn.basalt.snapshot" as Type<Readonly<{ [Type.Field]: "pn.basalt.snapshot", [SnapshotField]: any, [RefField]: any }>>
@@ -41,11 +29,7 @@ export const Snapshot = {
  */
 export function snapshot<Path extends string, Tree extends Database.Tree>(db: Database, snapshot: { data: () => any, exists: boolean | (() => boolean), ref: { path: string } }): MaybeSnapshot<Path, Tree>
 {
-	if (!getSnapshotExists(snapshot)) return {
-		[Type.Field]: "pn.basalt.empty_snapshot",
-		[SnapshotField]: snapshot,
-		[RefField]: doc(snapshot.ref.path) as any,
-	}
+	if (!getSnapshotExists(snapshot)) return undefined
 
 	return {
 		...convertData(db, snapshot.data()),
