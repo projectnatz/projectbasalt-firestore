@@ -11,7 +11,7 @@
     "test:ts": "npx tsc --noEmit",
     "build": "npx tsc",
     "clean": "rm -rf dist",
-    "prepare-pack": "npm run build && cp package.json ./dist && cp .npmignore ./dist && cp ./src/global.d.ts ./dist",
+    "prepare-pack": "npm run clean && npm run build && cp package.json ./dist && cp .npmignore ./dist && cp ./src/global.d.ts ./dist",
     "bundle": "npm run prepare-pack && npm pack ./dist && npm run clean",
     "release": "npm run prepare-pack && npm publish ./dist && npm run clean"
   },

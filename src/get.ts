@@ -21,19 +21,19 @@ export interface Unsubscribe
  * 
  * @version 1.0.0
  */
-export function getDoc<PATH extends string, DB extends Database>(transaction: Transaction<DB>, reference: Doc<PATH>): Promise<MaybeSnapshot<PATH, Database.Collection<DB>>>
+export function getDoc<Path extends string, DB extends Database>(transaction: Transaction<DB>, reference: Doc<Path> | Path): Promise<MaybeSnapshot<Path, Database.Collection<DB>>>
 
 /**
  * Reads the document referred to by this `DocumentReference`.
  * 
  * @version 1.0.0
  */
-export function getDoc<PATH extends string, DB extends Database>(db: DB, reference: Doc<PATH>): Promise<MaybeSnapshot<PATH, Database.Collection<DB>>>
+export function getDoc<Path extends string, DB extends Database>(db: DB, reference: Doc<Path> | Path): Promise<MaybeSnapshot<Path, Database.Collection<DB>>>
 
-export function getDoc(source: Transaction<Database> | Database, reference: Doc<string>): Promise<MaybeSnapshot<string, any>>
+export function getDoc(source: Transaction<Database> | Database, reference: Doc<string> | string): Promise<MaybeSnapshot<string, any>>
 {
 	const db = typecheck(source, Database) ? source : source._db
-	const documentReference = db.doc(reference.path)
+	const documentReference = db.doc(typeof reference === "string" ?  reference : reference.path)
 
 	return (typecheck(source, Database) ? source.getDoc(documentReference) : source._transaction.get(documentReference))
 		.then(documentSnapshot => snapshot(db, documentSnapshot))
@@ -52,9 +52,9 @@ export function getDocs<Id extends string, DB extends Database>(db: DB | Transac
  * 
  * @version 1.0.0
  */
-export function getDocs<Path extends string, DB extends Database>(db: DB | Transaction<DB>, query: Collection<Path> | Query.Standard<Path>): Promise<QuerySnapshot<Path, Database.Collection<DB>>>
+export function getDocs<Path extends string, DB extends Database>(db: DB | Transaction<DB>, query: Collection<Path> | Query.Standard<Path> | Path): Promise<QuerySnapshot<Path, Database.Collection<DB>>>
 
-export function getDocs(source: Database | Transaction<Database>, query: CollectionGroup<string> | Collection<string> | Query<string>): Promise<QuerySnapshot<any, any>>
+export function getDocs(source: Database | Transaction<Database>, query: CollectionGroup<string> | Collection<string> | Query<string> | string): Promise<QuerySnapshot<any, any>>
 {
 	const db = typecheck(source, Database) ? source : source._db
 	const reference =
@@ -62,6 +62,8 @@ export function getDocs(source: Database | Transaction<Database>, query: Collect
 			? db.collection(query.path)
 		: typecheck(query, CollectionGroup)
 			? db.collectionGroup(query.id)
+		: typeof query === "string"
+			? db.collection(query)
 			: prepareQuery(db, query)
 
 	return (typecheck(source, Database) ? source.getDocs(reference) : source._transaction.get(reference))

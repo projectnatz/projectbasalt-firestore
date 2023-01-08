@@ -2,7 +2,7 @@ import { Type } from "@projectbasalt/core"
 import { Database } from "./Database"
 import { FieldPath, prepareFieldPath } from "./FieldPath"
 import { prepareFieldValue } from "./FieldValue"
-import { Snapshot, SnapshotField } from "./Snapshot"
+import { Snapshot } from "./Snapshot"
 
 /** @version 1.0.0 */
 export type QueryConstraint
@@ -108,12 +108,12 @@ export const orderBy = (fieldPath: string | FieldPath, direction: "asc"|"desc"):
 export const prepareConstraint = <DB extends Database>(db: DB, constraint: QueryConstraint) =>
 {
 	switch (constraint[Type.Field]) {
-		case "pn.basalt.query_constraint.end_at": return db.endAt(constraint.snapshot[SnapshotField])
-		case "pn.basalt.query_constraint.end_before": return db.endBefore(constraint.snapshot[SnapshotField])
+		case "pn.basalt.query_constraint.end_at": return db.endAt(db.manage.snapshot(constraint.snapshot))
+		case "pn.basalt.query_constraint.end_before": return db.endBefore(db.manage.snapshot(constraint.snapshot))
 		case "pn.basalt.query_constraint.limit": return db.limit(constraint.limit)
 		case "pn.basalt.query_constraint.order_by": return db.orderBy(prepareFieldPath(db, constraint.fieldPath), constraint.direction)
-		case "pn.basalt.query_constraint.start_after": return db.startAfter(constraint.snapshot[SnapshotField])
-		case "pn.basalt.query_constraint.start_at": return db.startAt(constraint.snapshot[SnapshotField])
+		case "pn.basalt.query_constraint.start_after": return db.startAfter(db.manage.snapshot(constraint.snapshot))
+		case "pn.basalt.query_constraint.start_at": return db.startAt(db.manage.snapshot(constraint.snapshot))
 		case "pn.basalt.query_constraint.where": return db.where(prepareFieldPath(db, constraint.fieldPath), constraint.op, prepareFieldValue(db, constraint.value))
 	}
 

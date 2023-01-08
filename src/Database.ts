@@ -73,6 +73,11 @@ export interface Database<
 	updateDoc(documentReference: DocumentReference, data: unknown): Promise<WriteResult>
 	where(field: string | FieldPath, op: string, value: unknown): QueryConstraint
 	writeBatch(): WriteBatch
+
+	manage: {
+		snapshot(obj: Object): DocumentSnapshot
+		snapshot(obj: Object, snapshot: DocumentSnapshot): void
+	}
 }
 
 const Config = {
@@ -201,9 +206,27 @@ export const database = <
 	Transaction extends Database.Transaction<DocumentReference, DocumentSnapshot, Query, QueryDocumentSnapshot, QuerySnapshot>= Database.Transaction<DocumentReference, DocumentSnapshot, Query, QueryDocumentSnapshot, QuerySnapshot>,
 	WriteResult = any,
 	WriteBatch extends Database.WriteBatch<DocumentReference> = Database.WriteBatch<DocumentReference, WriteResult>,
->(methods: Omit<Database<any, CollectionGroup, CollectionReference, DocumentReference, DocumentSnapshot, FieldPath, FieldValue, GeoPoint, Query, QueryConsttaint, QueryDocumentSnapshot, QuerySnapshot, Timestamp, Transaction, WriteResult, WriteBatch>, "collections" | Type.Field>) =>
+>(methods: Omit<Database<any, CollectionGroup, CollectionReference, DocumentReference, DocumentSnapshot, FieldPath, FieldValue, GeoPoint, Query, QueryConsttaint, QueryDocumentSnapshot, QuerySnapshot, Timestamp, Transaction, WriteResult, WriteBatch>, "collections" | "manage" | Type.Field>) =>
 	<Tree extends Database.Tree>(): Database<Tree, CollectionGroup, CollectionReference, DocumentReference, DocumentSnapshot, FieldPath, FieldValue, GeoPoint, Query, QueryConsttaint, QueryDocumentSnapshot, QuerySnapshot, Timestamp, Transaction, WriteResult, WriteBatch> =>
-		({
+	{
+		const snapshots = new WeakMap<Object, DocumentSnapshot>()
+
+		return {
 			...methods,
 			[Type.Field]: "pn.basalt.database",
-		})
+			manage:
+			{
+				snapshot: (obj: Object, snapshot?: DocumentSnapshot): any =>
+				{
+					if (snapshot) {
+						snapshots.set(obj, snapshot)
+						return undefined
+					}
+
+					const found = snapshots.get(obj)
+					if (!found) throw new Error("Can't find the snapshot used by the query. Are you using the same database instance?")
+					return found
+				}
+			}
+		}
+	}

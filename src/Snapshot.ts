@@ -4,8 +4,6 @@ import { doc, Doc } from "./Doc"
 import { PathValue } from "./Path"
 import { RefField } from "./ref"
 
-export const SnapshotField = Symbol("pn.basalt.snapshot_field")
-
 /** @version 1.0.0 */
 export type MaybeSnapshot<Path extends string, Tree extends Database.Tree> = undefined | Snapshot<Path, Tree>
 
@@ -13,12 +11,11 @@ export type MaybeSnapshot<Path extends string, Tree extends Database.Tree> = und
 export type Snapshot<Path extends string, Tree extends Database.Tree> = ([PathValue<Path, Tree>] extends [never] ? {} : PathValue<Path, Tree>) &
 {
 	readonly [Type.Field]: "pn.basalt.snapshot"
-	readonly [SnapshotField]: any
 	readonly [RefField]: Doc<Path>
 }
 
 export const Snapshot = {
-	Type: "pn.basalt.snapshot" as Type<Readonly<{ [Type.Field]: "pn.basalt.snapshot", [SnapshotField]: any, [RefField]: any }>>
+	Type: "pn.basalt.snapshot" as Type<Readonly<{ [Type.Field]: "pn.basalt.snapshot", [RefField]: any }>>
 } as const
 
 
@@ -31,12 +28,15 @@ export function snapshot<Path extends string, Tree extends Database.Tree>(db: Da
 {
 	if (!getSnapshotExists(snapshot)) return undefined
 
-	return {
+	const value = {
 		...convertData(db, snapshot.data()),
 		[Type.Field]: "pn.basalt.snapshot",
-		[SnapshotField]: snapshot,
 		[RefField]: doc(snapshot.ref.path),
 	}
+
+	db.manage.snapshot(value, snapshot)
+
+	return value
 }
 
 /**

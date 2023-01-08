@@ -5,7 +5,7 @@ import { doc, Doc } from "./Doc"
 import { parentPath, PathParent } from "./Path"
 import type { Snapshot } from "./Snapshot"
 
-export const RefField = Symbol("pn.basalt.ref_field")
+export const RefField = "_ref"
 
 /**
  * Get the reference to the parent document of a collection.
