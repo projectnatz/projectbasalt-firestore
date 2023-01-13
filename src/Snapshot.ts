@@ -56,11 +56,13 @@ function getSnapshotExists(snapshot: { exists: boolean | (() => boolean) })
  * 
  * @version 1.0.0
  */
-function convertData(db: Database, data: unknown)
+function convertData(db: Database, data: unknown): any
 {
 	if (typeof data === "object" && data !== null) {
 		if (db.isDocumentReference(data)) return doc(data.path)
 		if (db.isGeoPoint(data) || db.isTimestamp(data)) return data
+
+		if (Array.isArray(data)) return data.map(item => convertData(db, item))
 
 		const converted: any = {}
 
