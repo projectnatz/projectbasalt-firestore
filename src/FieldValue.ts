@@ -186,7 +186,8 @@ export const geopoint = (latitude: number, longitude: number): FieldValue.GeoPoi
  */
 export const prepareData = <DB extends Database>(db: DB, data: unknown) =>
 {
-	if (data === undefined || data === null || typeof data === "boolean" || typeof data === "number" || typeof data === "string" || typeof data === "bigint" || Array.isArray(data)) return data
+	if (data === undefined || data === null || typeof data === "boolean" || typeof data === "number" || typeof data === "string" || typeof data === "bigint") return data
+	if (Array.isArray(data)) return data.map(datum => prepareFieldValue(db, datum))
 	if (typeof data !== "object") return undefined
 
 	return prepareFieldValue(db, data as any)
@@ -197,10 +198,11 @@ export const prepareData = <DB extends Database>(db: DB, data: unknown) =>
  * 
  * @version 1.0.0
  */
-export const prepareFieldValue = <DB extends Database>(db: DB, fieldValue: unknown) =>
+export const prepareFieldValue = <DB extends Database>(db: DB, fieldValue: unknown): any =>
 {
 	if (fieldValue === undefined || typeof fieldValue === "symbol" || typeof fieldValue === "function") return undefined
-	if (fieldValue === null || typeof fieldValue !== "object" || Array.isArray(fieldValue) || db.isDocumentReference(fieldValue) || db.isGeoPoint(fieldValue) || db.isTimestamp(fieldValue)) return fieldValue
+	if (fieldValue === null || typeof fieldValue !== "object" || db.isDocumentReference(fieldValue) || db.isGeoPoint(fieldValue) || db.isTimestamp(fieldValue)) return fieldValue
+	if (Array.isArray(fieldValue)) return fieldValue.map(data => prepareFieldValue(db, data))
 
 	if (fieldValue instanceof Date) return db.timestampFromDate(fieldValue)
 
