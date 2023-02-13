@@ -146,10 +146,10 @@ export const collectionPath = <PATH extends string>(collectionPath: PATH): PathC
 /**
  * Remove the optional `/` before and after the path.
  * 
- * @version 1.0.0
+ * @version 1.0.1
  */
 export const path = <Path extends string>(path: Path): EscapePath<Path> =>
-	path.match(/(?:\/)?((?:\w+\/)*\w+)(?:\/)?/)?.[1] ?? path as any
+	path.match(/(?:\/)?((?:[\w-]+\/)*[\w-]+)(?:\/)?/)?.[1] ?? path as any
 
 /**
  * Fetch the document id of the path.
